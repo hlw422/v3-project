@@ -31,26 +31,54 @@ const state = reactive({
 const setCount = () => {
   state.count++;
 };
+
+const deepData=ref({count:0,name:'chain'})
 const refCount=ref(0)
 console.log(refCount)
 const setRefCount = () => {
   refCount.value++           
 };
+const changeName=()=>{
+  name.value=name.value+'pc'
+}
 
 //单个数据监听
 watch(refCount,(newval,oldval)=>{
   console.log('count watch',newval,oldval)
+},
+{
+  //数据初始化时先执行一次
+  immediate:true 
 })
 const name=ref('cp')
 //多个数据监听
-watch(refCount,(newval,oldval)=>{
-  console.log('count watch',newval,oldval)
+watch([refCount,name],([newval,newName],[oldval,oldName])=>{
+  console.log('count name watch',[newval,newName],[oldval,oldName])
 })
 const list=ref([1,2,3,4,5,6,7,8])
 const computedList=computed(()=>{
   return list.value.filter(item=>item>2)
 })
+//watch深度监听
+//watch(deepData,(newval,oldval)=>{
+//  console.log('deepData变化了',newval,oldval)
+//},{
+//  deep:true
+//})
 
+//深度监听
+const changeDeepName=()=>{
+   deepData.value.name+='china'
+}
+const changeDeepCount=()=>{
+   deepData.value.count++
+}
+watch(
+  ()=>deepData.value.name,
+  (newval,oldval)=>{
+    console.log('deepData.value.name 变化了',newval,oldval)
+  }
+)
 setTimeout(() => {
   list.value.push(9,10)
 }, 3000);
@@ -70,5 +98,14 @@ setTimeout(() => {
   </div>
   <div>
 {{ computedList }}
+  </div>
+  <div>
+    <button @click="changeName">changeName</button>
+  </div>
+  <div>
+    <button @click="changeDeepName">changeDeepName</button>
+  </div>
+  <div>
+    <button @click="changeDeepCount">changeDeepCount</button>
   </div>
 </template>
